@@ -462,3 +462,40 @@ Matrix4x4 MakeRotateZmatrix(float radian)
 
 	return AnserM;
 }
+
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& translate)
+{
+	Matrix4x4 AnserM = {
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,1.0f,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
+
+	Matrix4x4 ScaleMatrix = MakeScaleMatrix(scale);
+
+	Matrix4x4 RotateMatrixX = MakeRotateXmatrix(rot.x);
+	Matrix4x4 RotateMatrixY = MakeRotateYmatrix(rot.y);
+	Matrix4x4 RotateMatrixZ = MakeRotateZmatrix(rot.z);
+	Matrix4x4 RotateMatrixXYZ = Multiply(RotateMatrixX, Multiply(RotateMatrixY, RotateMatrixZ));
+
+	Matrix4x4 TranslationMatrix = MakeTranslateMatrix(translate);
+
+	for (int i = 0; i < 3; i++) {
+		AnserM.m[0][i] = ScaleMatrix.m[0][0] * RotateMatrixXYZ.m[0][i];
+	}
+
+	for (int i = 0; i < 3; i++) {
+		AnserM.m[1][i] = ScaleMatrix.m[1][1] * RotateMatrixXYZ.m[1][i];
+	}
+
+	for (int i = 0; i < 3; i++) {
+		AnserM.m[2][i] = ScaleMatrix.m[2][2] * RotateMatrixXYZ.m[2][i];
+	}
+
+	for (int i = 0; i < 3; i++) {
+		AnserM.m[3][i] = TranslationMatrix.m[3][i];
+	}
+
+	return AnserM;
+}
