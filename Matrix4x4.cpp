@@ -1,4 +1,5 @@
 #include "Matrix4x4.h"
+#include <assert.h>
 
 Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2)
 {
@@ -267,6 +268,57 @@ Matrix4x4 MakeIdentity4x4()
 
 
 	return AnserM;
+}
+
+Matrix4x4 MakeTranslateMatrix(const Vector3& translate)
+{
+	Matrix4x4 AnserM = {
+		1.0f,0.0f,0.0f,0.0f,
+		0.0f,1.0f,0.0f,0.0f,
+		0.0f,0.0f,1.0f,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
+
+	AnserM.m[3][0] = translate.x;
+	AnserM.m[3][1] = translate.y;
+	AnserM.m[3][2] = translate.z;
+
+	return AnserM;
+}
+
+Matrix4x4 MakeScaleMatrix(const Vector3& scale)
+{
+	Matrix4x4 AnserM = {
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
+
+	AnserM.m[0][0] = scale.x;
+	AnserM.m[1][1] = scale.y;
+	AnserM.m[2][2] = scale.z;
+
+	return AnserM;
+}
+
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix)
+{
+	Vector3 AnserV = {
+		0.0f,0.0f,0.0f
+	};
+	
+	AnserV.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
+	AnserV.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
+	AnserV.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + 1.0f * matrix.m[3][2];
+
+	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] + 1.0f * matrix.m[3][3];
+	assert(w != 0.0f);
+	AnserV.x /= w;
+	AnserV.y /= w;
+	AnserV.z /= w;
+	
+	return AnserV;
 }
 
 float AMatrixMuliply4( Matrix4x4 m,int num)
