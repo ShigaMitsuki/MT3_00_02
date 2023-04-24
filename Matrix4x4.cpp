@@ -411,3 +411,54 @@ float MatrixAbs(Matrix4x4 m)
 
 	return Anser;
 }
+
+Matrix4x4 MakeRotateXmatrix(float radian)
+{
+	Matrix4x4 AnserM = {
+		1.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
+
+	AnserM.m[1][1] = std::cosf(radian);
+	AnserM.m[1][2] = std::sinf(radian);
+	AnserM.m[2][1] = -std::sinf(radian);
+	AnserM.m[2][2] = std::cosf(radian);
+
+	return AnserM;
+}
+
+Matrix4x4 MakeRotateYmatrix(float radian)
+{
+	Matrix4x4 AnserM = {
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,1.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
+
+	AnserM.m[0][0] = std::cosf(radian);
+	AnserM.m[0][2] = -std::sinf(radian);
+	AnserM.m[2][0] = std::sinf(radian);
+	AnserM.m[2][2] = std::cosf(radian);
+
+	return AnserM;
+}
+
+Matrix4x4 MakeRotateZmatrix(float radian)
+{
+	Matrix4x4 AnserM = {
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,1.0f,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
+
+	AnserM.m[0][0] = std::cosf(radian);
+	AnserM.m[0][1] = std::sinf(radian);
+	AnserM.m[1][0] = -std::sinf(radian);
+	AnserM.m[1][1] = std::cosf(radian);
+
+	return AnserM;
+}
