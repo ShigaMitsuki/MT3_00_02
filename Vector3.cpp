@@ -79,3 +79,27 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 
 	return AnserV;
 }
+
+Vector3 Project(const Vector3& v1, const Vector3& v2)
+{
+	v1;
+	v2;
+	Vector3 AnserV = { 0.0f,0.0f,0.0f };
+	float Leng = Length(v2);
+	AnserV = Multiply(Dot(v1,v2) / (Leng * Leng),v2);
+
+	return AnserV;
+}
+
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
+{
+	point;
+	segment;
+	Vector3 AnserV = { 0.0f,0.0f,0.0f };
+
+	Vector3 tb = Project(Subtract(point, segment.origin), segment.diff);
+
+	AnserV = Add(segment.origin, tb);
+
+	return AnserV;
+}
