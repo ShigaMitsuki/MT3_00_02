@@ -29,15 +29,12 @@ void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label
 const int kWindwWidth = 1280;
 const int kWindwHeight = 720;
 
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// ライブラリの初期化
 	Novice::Initialize(kWindowTitle, 1280, 720);
-	
-	Vector3 v1{1.2f,-3.9f,2.5f };
-	Vector3 v2{ 2.8f,0.4f,-1.3f};
-	Vector3 cross = Cross(v1, v2);
 	
 	Vector3 Translate{};
 	Vector3 Rotate{};
@@ -46,14 +43,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 CameraRotate{0.26f,0.0f,0.0f};
 	//Vector3 CameraPosition{};
 
-	Segment segment{ {-2.0f,-1.0f,0.0f} ,{3.0f,2.0f,2.0f} };
-	Vector3 point{ -1.5f,0.0f,0.6f };
+	Sphere SphereA = {
+		{ 0.0f,0.0f,0.0f},
+		0.5f
+	};
 
-	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
-	Vector3 clossPoint = ClosestPoint(point, segment);
+	Sphere SphereB = {
+		{ 2.0f,0.0f,2.0f},
+		1.0f
+	};
 
-	Sphere pointSphere = { point , 0.01f };
-	Sphere clossPointSphere = { clossPoint, 0.01f };
+	int color = WHITE;
 
 	Matrix4x4 WorldMatrix = MakeAffineMatrix({1.0f,1.0f,1.0f},Rotate,Translate);
 	Matrix4x4 CameraMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, CameraRotate, CameraTranslate);
@@ -61,9 +61,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 ProjectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindwWidth) / float(kWindwHeight),0.1f,100.0f);
 	Matrix4x4 WorldViewProjectionMatrix = Multiply(WorldMatrix, Multiply(ViewMatrix, ProjectionMatrix));
 	Matrix4x4 ViewPortMatrix = MakeViewportMatrix(0,0,float(kWindwWidth),float(kWindwHeight),0.0f,1.0f);
-	
-	Vector3 start = Transform(Transform(segment.origin, WorldViewProjectionMatrix), ViewPortMatrix);
-	Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), WorldViewProjectionMatrix), ViewPortMatrix);
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -85,12 +82,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		if (keys[DIK_O] != 0) {
 			//CameraPosition.x += 0.5f;
 		}
-
-		project = Project(Subtract(point, segment.origin), segment.diff);
-		clossPoint = ClosestPoint(point, segment);
-
-		pointSphere = { point , 0.01f };
-		clossPointSphere = { clossPoint, 0.01f };
+		
 
 		WorldMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, Rotate, Translate);
 		CameraMatrix = MakeAffineMatrix({ 1.0f,1.0f,1.0f }, CameraRotate, CameraTranslate);
@@ -99,8 +91,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		WorldViewProjectionMatrix = Multiply(WorldMatrix, Multiply(ViewMatrix, ProjectionMatrix));
 		ViewPortMatrix = MakeViewportMatrix(0, 0, float(kWindwWidth), float(kWindwHeight), 0.0f, 1.0f);
 
-		start = Transform(Transform(segment.origin, WorldViewProjectionMatrix), ViewPortMatrix);
-		end = Transform(Transform(Add(segment.origin, segment.diff), WorldViewProjectionMatrix), ViewPortMatrix);
+		if (IsCollision(SphereA, SphereB)) {
+			color = RED;
+		}
+		else {
+			color = WHITE;
+		}
 
 		///
 		/// ↑更新処理ここまで
@@ -110,24 +106,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		ImGui::Begin("Window");
+		//sImGui::Begin("Window");
 		//ImGui::DragFloat3("CameraTranslate", &CameraTranslate.x, 0.01f);
 		//ImGui::DragFloat3("CameraRotate", &CameraRotate.x, 0.01f);/*
 		//
-		//ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);*/
+		ImGui::DragFloat("Radius_A", &SphereA.radius, 0.01f);
+		ImGui::DragFloat3("Center_A", &SphereA.center.x, 0.01f);
 
-		ImGui::DragFloat3("point", &point.x, 0.01f);
-
-		ImGui::InputFloat3("Project", &project.x, " %.3f",ImGuiInputTextFlags_ReadOnly);
-		ImGui::End();
+		ImGui::DragFloat("Radius_B", &SphereB.radius, 0.01f);
+		ImGui::DragFloat3("Center_B", &SphereB.center.x, 0.01f);
 
 		DrawGrid(WorldViewProjectionMatrix,ViewPortMatrix);
-		DrawSphere(pointSphere, WorldViewProjectionMatrix, ViewPortMatrix, RED);;
-		DrawSphere(clossPointSphere, WorldViewProjectionMatrix, ViewPortMatrix, BLACK);;
-
-		Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), WHITE);
-
-		Novice::ScreenPrintf(0, 0, "%0.1f,%0.1f,%0.1f,%0.1f", start.x, start.y, end.x, end.y);
+		DrawSphere(SphereA, WorldViewProjectionMatrix, ViewPortMatrix, color);
+		DrawSphere(SphereB, WorldViewProjectionMatrix, ViewPortMatrix, color);
 
 		///
 		/// ↑描画処理ここまで

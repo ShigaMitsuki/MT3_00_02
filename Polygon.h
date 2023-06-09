@@ -12,3 +12,4 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjection, const Matrix4x4& viewPortMatrix, uint32_t color);
 
 
+bool IsCollision(const Sphere SphereA, const Sphere SphereB);
