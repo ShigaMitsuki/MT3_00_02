@@ -139,6 +139,17 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 	Novice::DrawLine(int(points[2].x), int(points[2].y), int(points[0].x), int(points[0].y), color);
 }
 
+void DrawLine(const Segment& segment, const Matrix4x4& viewProjection, const Matrix4x4& viewPortMatrix, uint32_t color)
+{
+	Vector3 Pos1 = {0.0f,0.0f,0.0f};
+	Vector3 Pos2 = { 0.0f,0.0f,0.0f };
+
+	Pos1 = Transform(Transform(segment.origin, viewProjection), viewPortMatrix);
+	Pos2 = Transform(Transform(Add(segment.origin, segment.diff), viewProjection), viewPortMatrix);
+
+	Novice::DrawLine(int(Pos1.x), int(Pos1.y), (int)Pos2.x, (int)Pos2.y, color);
+}
+
 bool IsCollision(const Sphere& SphereA, const Sphere& SphereB)
 {
 	float distance = Length(Subtract(SphereA.center, SphereB.center));
@@ -153,6 +164,23 @@ bool IsCollision(const Sphere& sphere, const Plane& plane)
 	float distance = fabsf(Dot(plane.normal, sphere.center) - plane.distance);
 
 	if (distance <= sphere.radius) {
+		return true;
+	}
+
+	return false;
+}
+
+bool IsCollision(const Segment& segment, const Plane& plane)
+{
+	float dot = Dot(plane.normal, segment.diff);
+
+	if (dot == 0.0f) {
+		return false;
+	}
+	
+	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
+
+	if (t >= 0.0f && t <= 1.0f) {
 		return true;
 	}
 

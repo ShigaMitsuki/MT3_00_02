@@ -43,9 +43,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 CameraRotate{0.26f,0.0f,0.0f};
 	//Vector3 CameraPosition{};
 
-	Sphere sphere = {
+	Segment segment = {
 		{ 0.0f,0.0f,0.0f},
-		0.5f
+		{ 1.0f,1.0f,1.0f}
 	};
 
 	Plane plane = {
@@ -91,7 +91,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		WorldViewProjectionMatrix = Multiply(WorldMatrix, Multiply(ViewMatrix, ProjectionMatrix));
 		ViewPortMatrix = MakeViewportMatrix(0, 0, float(kWindwWidth), float(kWindwHeight), 0.0f, 1.0f);
 
-		if (IsCollision(sphere, plane)) {
+		if (IsCollision(segment, plane)) {
 			color = RED;
 		}
 		else {
@@ -110,15 +110,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ImGui::DragFloat3("CameraTranslate", &CameraTranslate.x, 0.01f);
 		//ImGui::DragFloat3("CameraRotate", &CameraRotate.x, 0.01f);/*
 		//
-		ImGui::DragFloat("Radius", &sphere.radius, 0.01f);
-		ImGui::DragFloat3("Center", &sphere.center.x, 0.01f);
+		ImGui::DragFloat3("origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("diff", &segment.diff.x, 0.01f);
 		ImGui::DragFloat("distance", &plane.distance, 0.01f);
 		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
 
 		plane.normal = Normalize(plane.normal);
 
 		DrawGrid(WorldViewProjectionMatrix,ViewPortMatrix);
-		DrawSphere(sphere, WorldViewProjectionMatrix, ViewPortMatrix, color);
+		DrawLine(segment, WorldViewProjectionMatrix, ViewPortMatrix, color);
 		DrawPlane(plane, WorldViewProjectionMatrix, ViewPortMatrix, color);
 
 		///
