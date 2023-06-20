@@ -48,9 +48,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		{ 1.0f,1.0f,1.0f}
 	};
 
-	Plane plane = {
-		{ 0.0f,1.0f,0.0f},
-		0.5f
+	Triangle triangle = { {
+		{ -2.0f,-1.0f,1.0f},
+		{ 2.0f,-1.0f,1.0f},
+		{ 0.0f,1.0f,1.0f}}
 	};
 
 	int color = WHITE;
@@ -91,7 +92,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		WorldViewProjectionMatrix = Multiply(WorldMatrix, Multiply(ViewMatrix, ProjectionMatrix));
 		ViewPortMatrix = MakeViewportMatrix(0, 0, float(kWindwWidth), float(kWindwHeight), 0.0f, 1.0f);
 
-		if (IsCollision(segment, plane)) {
+		if (IsCollision(segment, triangle)) {
 			color = RED;
 		}
 		else {
@@ -112,14 +113,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//
 		ImGui::DragFloat3("origin", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("diff", &segment.diff.x, 0.01f);
-		ImGui::DragFloat("distance", &plane.distance, 0.01f);
-		ImGui::DragFloat3("normal", &plane.normal.x, 0.01f);
+		ImGui::DragFloat3("Triangle1", &triangle.vertices[0].x, 0.01f);
 
-		plane.normal = Normalize(plane.normal);
+		ImGui::DragFloat3("Triangle2", &triangle.vertices[1].x, 0.01f);
+
+		ImGui::DragFloat3("Triangle3", &triangle.vertices[2].x, 0.01f);
+
+		//plane.normal = Normalize(plane.normal);
 
 		DrawGrid(WorldViewProjectionMatrix,ViewPortMatrix);
 		DrawLine(segment, WorldViewProjectionMatrix, ViewPortMatrix, color);
-		DrawPlane(plane, WorldViewProjectionMatrix, ViewPortMatrix, color);
+		DrawTriangle(triangle, WorldViewProjectionMatrix, ViewPortMatrix, color);
 
 		///
 		/// ↑描画処理ここまで

@@ -150,6 +150,24 @@ void DrawLine(const Segment& segment, const Matrix4x4& viewProjection, const Mat
 	Novice::DrawLine(int(Pos1.x), int(Pos1.y), (int)Pos2.x, (int)Pos2.y, color);
 }
 
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjection, const Matrix4x4& viewPortMatrix, uint32_t color)
+{
+	Vector3 Pos[3]{};
+
+	for (int i = 0; i < 3; i++) {
+		Pos[i] = Transform(Transform(triangle.vertices[i], viewProjection), viewPortMatrix);
+	}
+
+	Novice::DrawTriangle(
+		(int)Pos[0].x, (int)Pos[0].y,
+		(int)Pos[1].x, (int)Pos[1].y,
+		(int)Pos[2].x, (int)Pos[2].y,
+		color, kFillModeWireFrame
+
+	);
+
+}
+
 bool IsCollision(const Sphere& SphereA, const Sphere& SphereB)
 {
 	float distance = Length(Subtract(SphereA.center, SphereB.center));
@@ -181,6 +199,56 @@ bool IsCollision(const Segment& segment, const Plane& plane)
 	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
 
 	if (t >= 0.0f && t <= 1.0f) {
+		return true;
+	}
+
+	return false;
+}
+
+bool IsCollision(const Segment& segment, const Triangle& triangle)
+{
+
+	Vector3 v01 = Subtract(triangle.vertices[1], triangle.vertices[0]);
+	Vector3 v12 = Subtract(triangle.vertices[2], triangle.vertices[1]);
+	Vector3 v20 = Subtract(triangle.vertices[0], triangle.vertices[2]);
+
+	Vector3 n = Cross(v01,v12);
+
+	n = Normalize(n);
+
+	float distance = Dot(triangle.vertices[0], n);
+
+	float dot = Dot(n, segment.diff);
+
+	if (dot == 0.0f) {
+		return false;
+	}
+
+
+
+	float t = (distance - Dot(segment.diff, n)) / dot;
+
+	//if (t >= 0.0f && t <= 1.0f) {
+	//	return true;
+	//}
+
+	if (t < 0.0f || t > 1.0f) {
+		//return true;
+		return false;
+	}
+
+	Vector3 point = Add(segment.origin, Multiply(t, segment.diff));
+
+	Vector3 v0p = Subtract(point, triangle.vertices[0]);
+	Vector3 v1p = Subtract(point, triangle.vertices[1]);
+	Vector3 v2p = Subtract(point, triangle.vertices[2]);
+
+	Vector3 cross01 = Cross(v01, v1p);
+	Vector3 cross12 = Cross(v12, v2p);
+	Vector3 cross20 = Cross(v20, v0p);
+
+	if (Dot(cross01,n) >= 0.0f && Dot(cross12, n) >= 0.0f && Dot(cross20, n) >= 0.0f)  {
+
 		return true;
 	}
 
