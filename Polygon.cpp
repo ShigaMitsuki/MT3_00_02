@@ -363,3 +363,39 @@ bool IsCollision(const AABB& aabb, const Sphere& sphere)
 	return false;
 }
 
+bool IsCollision(const AABB& aabb, const Segment& segment)
+{
+	float tMinX = (aabb.min.x - segment.origin.x) / segment.diff.x;
+	float tMaxX = (aabb.max.x - segment.origin.x) / segment.diff.x;
+
+	float tMinY = (aabb.min.y - segment.origin.y) / segment.diff.y;
+	float tMaxY = (aabb.max.y - segment.origin.y) / segment.diff.y;
+
+	float tMinZ = (aabb.min.z - segment.origin.z) / segment.diff.z;
+	float tMaxZ = (aabb.max.z - segment.origin.z) / segment.diff.z;
+
+	float tNearX = min(tMinX, tMaxX);
+	float tFarX = max(tMinX, tMaxX);
+
+	float tNearY = min(tMinY, tMaxY);
+	float tFarY = max(tMinY, tMaxY);
+
+	float tNearZ = min(tMinZ, tMaxZ);
+	float tFarZ = max(tMinZ, tMaxZ);
+
+
+	float tMin = max(max(tNearX, tNearY), tNearZ);
+	float tMax = min(min(tFarX, tFarY), tFarZ);
+
+	if (tMin <= tMax &&
+
+		((tMin >= 0.0f && tMin <= 1.0f) || (tMax >= 0.0f && tMax <= 1.0f))) {
+
+		return true;
+
+	}
+
+	return false;
+
+}
+

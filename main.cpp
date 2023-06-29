@@ -48,9 +48,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.max{0.0f,0.0f,0.0f},
 	};
 
-	Sphere sphere{
-		{0.0f,0.0f,1.0f},
-		0.5f,
+	Segment segment{
+		{-0.7f,0.3f,0.0f},
+		{2.0f,-0.3f,0.0f},
 	};
 
 	int color = WHITE;
@@ -91,7 +91,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		WorldViewProjectionMatrix = Multiply(WorldMatrix, Multiply(ViewMatrix, ProjectionMatrix));
 		ViewPortMatrix = MakeViewportMatrix(0, 0, float(kWindwWidth), float(kWindwHeight), 0.0f, 1.0f);
 
-		if (IsCollision(aabb, sphere)) {
+		if (IsCollision(aabb, segment)) {
 			color = RED;
 		}
 		else {
@@ -114,8 +114,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("aabb min", &aabb.min.x, 0.01f);
 		ImGui::DragFloat3("aabb max", &aabb.max.x, 0.01f);
 		
-		ImGui::DragFloat3("Sphere pos", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("Sphere radius", &sphere.radius);
+		ImGui::DragFloat3("origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("diff", &segment.diff.x, 0.01f);
 
 		//plane.normal = Normalize(plane.normal);
 
@@ -130,7 +130,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(WorldViewProjectionMatrix,ViewPortMatrix);
 		DrawAABB(aabb,WorldViewProjectionMatrix,ViewPortMatrix,color);
-		DrawSphere(sphere, WorldViewProjectionMatrix, ViewPortMatrix, color);
+		DrawLine(segment, WorldViewProjectionMatrix, ViewPortMatrix, color);
 
 		/// ↑描画処理ここまで
 		///
