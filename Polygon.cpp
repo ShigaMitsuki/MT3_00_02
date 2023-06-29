@@ -168,6 +168,86 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjection, con
 
 }
 
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjection, const Matrix4x4& viewPortMatrix, uint32_t color)
+{
+
+	Segment minXmaxXminYminZ{
+		{aabb.min.x,aabb.min.y,aabb.min.z},
+		Subtract({aabb.max.x,aabb.min.y,aabb.min.z},minXmaxXminYminZ.origin)
+	};
+
+	Segment minXmaxXmaxYminZ{
+		{aabb.min.x,aabb.max.y,aabb.min.z},
+		Subtract({aabb.max.x,aabb.max.y,aabb.min.z},minXmaxXmaxYminZ.origin)
+	};
+
+	Segment minXmaxXminYmaxZ{
+		{aabb.min.x,aabb.min.y,aabb.max.z},
+		Subtract({aabb.max.x,aabb.min.y,aabb.max.z},minXmaxXminYmaxZ.origin)
+	};
+
+	Segment minXmaxXmaxYmaxZ{
+		{aabb.min.x,aabb.max.y,aabb.max.z},
+		Subtract({aabb.max.x,aabb.max.y,aabb.max.z},minXmaxXmaxYmaxZ.origin)
+	};
+
+	Segment minYmaxYminXminZ{
+		{aabb.min.x,aabb.min.y,aabb.min.z},
+		Subtract({aabb.min.x,aabb.max.y,aabb.min.z},minYmaxYminXminZ.origin)
+	};
+
+	Segment minYmaxYmaxXminZ{
+		{aabb.max.x,aabb.min.y,aabb.min.z},
+		Subtract({aabb.max.x,aabb.max.y,aabb.min.z},minYmaxYmaxXminZ.origin)
+	};
+
+	Segment minYmaxYminXmaxZ{
+		{aabb.min.x,aabb.min.y,aabb.max.z},
+		Subtract({aabb.min.x,aabb.max.y,aabb.max.z},minYmaxYminXmaxZ.origin)
+	};
+
+	Segment minYmaxYmaxXmaxZ{
+		{aabb.max.x,aabb.min.y,aabb.max.z},
+		Subtract({aabb.max.x,aabb.max.y,aabb.max.z},minYmaxYmaxXmaxZ.origin)
+	};
+
+	Segment minZmaxZminXminY{
+		{aabb.min.x,aabb.min.y,aabb.min.z},
+		Subtract({aabb.min.x,aabb.min.y,aabb.max.z},minZmaxZminXminY.origin)
+	};
+
+	Segment minZmaxZmaxXminY{
+		{aabb.max.x,aabb.min.y,aabb.min.z},
+		Subtract({aabb.max.x,aabb.min.y,aabb.max.z},minZmaxZmaxXminY.origin)
+	};
+
+	Segment minZmaxZminXmaxY{
+		{aabb.min.x,aabb.max.y,aabb.min.z},
+		Subtract({aabb.min.x,aabb.max.y,aabb.max.z},minZmaxZminXmaxY.origin)
+	};
+
+	Segment minZmaxZmaxXmaxY{
+		{aabb.max.x,aabb.max.y,aabb.min.z},
+		Subtract({aabb.max.x,aabb.max.y,aabb.max.z},minZmaxZmaxXmaxY.origin)
+	};
+
+
+	DrawLine(minXmaxXminYminZ, viewProjection, viewPortMatrix, color);
+	DrawLine(minXmaxXmaxYminZ, viewProjection, viewPortMatrix, color);
+	DrawLine(minXmaxXminYmaxZ, viewProjection, viewPortMatrix, color);
+	DrawLine(minXmaxXmaxYmaxZ, viewProjection, viewPortMatrix, color);
+
+	DrawLine(minYmaxYminXminZ, viewProjection, viewPortMatrix, color);
+	DrawLine(minYmaxYmaxXminZ, viewProjection, viewPortMatrix, color);
+	DrawLine(minYmaxYminXmaxZ, viewProjection, viewPortMatrix, color);
+	DrawLine(minYmaxYmaxXmaxZ, viewProjection, viewPortMatrix, color);
+
+	DrawLine(minZmaxZminXminY, viewProjection, viewPortMatrix, color);
+	DrawLine(minZmaxZmaxXminY, viewProjection, viewPortMatrix, color);
+	DrawLine(minZmaxZminXmaxY, viewProjection, viewPortMatrix, color);
+	DrawLine(minZmaxZmaxXmaxY, viewProjection, viewPortMatrix, color);
+}
+
 bool IsCollision(const Sphere& SphereA, const Sphere& SphereB)
 {
 	float distance = Length(Subtract(SphereA.center, SphereB.center));
@@ -249,6 +329,17 @@ bool IsCollision(const Segment& segment, const Triangle& triangle)
 
 	if (Dot(cross01,n) >= 0.0f && Dot(cross12, n) >= 0.0f && Dot(cross20, n) >= 0.0f)  {
 
+		return true;
+	}
+
+	return false;
+}
+
+bool IsCollision(const AABB& aabb1, const AABB& aabb2)
+{
+	if ((aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) &&
+		(aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y) &&
+		(aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z)) {
 		return true;
 	}
 

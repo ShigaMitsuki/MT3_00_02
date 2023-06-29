@@ -43,15 +43,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 CameraRotate{0.26f,0.0f,0.0f};
 	//Vector3 CameraPosition{};
 
-	Segment segment = {
-		{ 0.0f,0.0f,0.0f},
-		{ 1.0f,1.0f,1.0f}
+	AABB aabb1{
+		.min{-0.5f,-0.5f,-0.5f},
+		.max{0.0f,0.0f,0.0f},
 	};
 
-	Triangle triangle = { {
-		{ -2.0f,-1.0f,1.0f},
-		{ 2.0f,-1.0f,1.0f},
-		{ 0.0f,1.0f,1.0f}}
+	AABB aabb2{
+		.min{0.2f,0.2f,0.2f},
+		.max{1.0f,1.0f,1.0f},
 	};
 
 	int color = WHITE;
@@ -92,7 +91,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		WorldViewProjectionMatrix = Multiply(WorldMatrix, Multiply(ViewMatrix, ProjectionMatrix));
 		ViewPortMatrix = MakeViewportMatrix(0, 0, float(kWindwWidth), float(kWindwHeight), 0.0f, 1.0f);
 
-		if (IsCollision(segment, triangle)) {
+		if (IsCollision(aabb1, aabb2)) {
 			color = RED;
 		}
 		else {
@@ -111,20 +110,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ImGui::DragFloat3("CameraTranslate", &CameraTranslate.x, 0.01f);
 		//ImGui::DragFloat3("CameraRotate", &CameraRotate.x, 0.01f);/*
 		//
-		ImGui::DragFloat3("origin", &segment.origin.x, 0.01f);
-		ImGui::DragFloat3("diff", &segment.diff.x, 0.01f);
-		ImGui::DragFloat3("Triangle1", &triangle.vertices[0].x, 0.01f);
 
-		ImGui::DragFloat3("Triangle2", &triangle.vertices[1].x, 0.01f);
-
-		ImGui::DragFloat3("Triangle3", &triangle.vertices[2].x, 0.01f);
+		ImGui::DragFloat3("aabb1 min", &aabb1.min.x, 0.01f);
+		ImGui::DragFloat3("aabb1 max", &aabb1.max.x, 0.01f);
+		ImGui::DragFloat3("aabb2 min", &aabb2.min.x, 0.01f);
+		ImGui::DragFloat3("aabb2 max", &aabb2.max.x, 0.01f);
 
 		//plane.normal = Normalize(plane.normal);
 
 		DrawGrid(WorldViewProjectionMatrix,ViewPortMatrix);
-		DrawLine(segment, WorldViewProjectionMatrix, ViewPortMatrix, color);
-		DrawTriangle(triangle, WorldViewProjectionMatrix, ViewPortMatrix, color);
-
+		DrawAABB(aabb1,WorldViewProjectionMatrix,ViewPortMatrix,color);
+		DrawAABB(aabb2, WorldViewProjectionMatrix, ViewPortMatrix, color);
 		///
 		/// ↑描画処理ここまで
 		///
